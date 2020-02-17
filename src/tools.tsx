@@ -1,6 +1,4 @@
-import React from "react";
-
-import md5 from "md5";
+import crypto from "crypto-js";
 
 /**
  * List of all tools, generate UI from this.
@@ -28,43 +26,52 @@ type Tool<I, O> = {
 /**
  * FUNCTIONS
  */
-const nop: ToolFunc<{ data: string }, JSX.Element> = input => (
-  <h1>Testing {input.data}</h1>
-);
-const addOne: ToolFunc<{ data: string }, JSX.Element> = input => {
-  return <h1>{Number(input.data) + 1}</h1>;
-};
-const md5hash: ToolFunc<{ data: string }, JSX.Element> = input => (
-  <pre>{md5(input.data)}</pre>
-);
-const addThreeNumbers: ToolFunc<
-  { num1: string; num2: string; num3: string },
-  number
-> = input => Number(input.num1) + Number(input.num2) + Number(input.num3);
+const HASH_FUNCTIONS = [
+  { func: crypto.MD5, name: "MD5" },
+  { func: crypto.SHA1, name: "SHA1" },
+  { func: crypto.SHA256, name: "SHA256" },
+  { func: crypto.SHA512, name: "SHA512" },
+  { func: crypto.SHA3, name: "SHA3" },
+  { func: crypto.RIPEMD160, name: "RIPEMD160" }
+];
+
+const HMAC_FUNCTIONS = [
+  { func: crypto.HmacMD5, name: "Hmac MD5" },
+  { func: crypto.HmacSHA1, name: "Hmac SHA1" },
+  { func: crypto.HmacSHA256, name: "Hmac SHA256" },
+  { func: crypto.HmacSHA512, name: "Hmac SHA512" }
+];
 
 export const TOOLS: Array<Tool<any, any>> = [
   {
-    func: nop,
-    defaultValues: { data: "testing" },
-    name: "nop" as const,
-    live: true
+    func: () => null,
+    name: "====== HASHING ======",
+    defaultValues: {},
+    live: false
   },
+  ...HASH_FUNCTIONS.map(
+    e =>
+      ({
+        func: input => e.func(input.Message).toString(crypto.enc.Hex),
+        name: e.name,
+        live: true,
+        defaultValues: { Message: "hash me!" }
+      } as Tool<{ Message: string }, string>)
+  ),
   {
-    func: addOne,
-    defaultValues: { data: 12 },
-    name: "addone" as const,
-    live: true
+    func: () => null,
+    name: "====== HMAC ======",
+    defaultValues: {},
+    live: false
   },
-  {
-    func: md5hash,
-    defaultValues: { data: "eller hva" },
-    name: "md5" as const,
-    live: true
-  },
-  {
-    func: addThreeNumbers,
-    defaultValues: { num1: 10, num2: 12, num3: 14 },
-    name: "add three numbers" as const,
-    live: true
-  }
+  ...HMAC_FUNCTIONS.map(
+    e =>
+      ({
+        func: input =>
+          e.func(input.Message, input.Passphrase).toString(crypto.enc.Hex),
+        name: e.name,
+        live: true,
+        defaultValues: { Message: "hash me!", Passphrase: "secret password" }
+      } as Tool<{ Message: string; Passphrase: string }, string>)
+  )
 ];

@@ -10,6 +10,7 @@ import styled from "styled-components";
 const OutputPane = styled.div`
   border: 1px solid black;
   padding: 1em;
+  word-break: break-all;
 `;
 
 const Container = styled.div`
