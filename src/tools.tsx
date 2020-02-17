@@ -38,7 +38,7 @@ const md5hash: ToolFunc<{ data: string }, JSX.Element> = input => (
   <pre>{md5(input.data)}</pre>
 );
 const addThreeNumbers: ToolFunc<
-  { num1: number; num2: number; num3: number },
+  { num1: string; num2: string; num3: string },
   number
 > = input => Number(input.num1) + Number(input.num2) + Number(input.num3);
 
