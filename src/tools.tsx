@@ -20,12 +20,22 @@ type ToolFunc<I, O> = (input: I) => O;
  * live: should it update on each keypress? don't enable for taxing operations
  * desc: description to show
  */
-type Tool<I, O, N> = {
-  func: ToolFunc<I, O>;
-  defaultValues: I;
+type Tool<O, N> = {
+  func: ToolFunc<Record<string, string>, O>;
   name: N;
   description?: JSX.Element;
   live: boolean;
+  /**
+   * Used to define exra options
+   */
+  schema: Record<
+    string,
+    {
+      type: "number" | "string" | "select";
+      options?: Array<string>;
+      defaultValue: number | string;
+    }
+  >;
 };
 
 /**
@@ -62,6 +72,41 @@ const HMAC_FUNCTIONS = [
   { func: crypto.HmacSHA512, name: "Hmac SHA512" as const }
 ];
 
+const ENCODING_FUNCTIONS = [
+  {
+    func: (input: string) =>
+      crypto.enc.Hex.stringify(crypto.enc.Utf8.parse(input)),
+    name: "To Hex" as const,
+    description: (
+      <Typography>
+        In mathematics and computing, hexadecimal (also base 16, or hex) is a
+        positional system that represents numbers using a base of 16. Unlike the
+        common way of representing numbers with ten symbols, it uses sixteen
+        distinct symbols, most often the symbols "0"–"9" to represent values
+        zero to nine, and "A"–"F" (or alternatively "a"–"f") to represent values
+        ten to fifteen.
+      </Typography>
+    ),
+    schema: {}
+  },
+  {
+    func: (input: string) => btoa(input),
+    name: "To Base64" as const,
+    description: (
+      <Typography>
+        In computer science, Base64 is a group of binary-to-text encoding
+        schemes that represent binary data in an ASCII string format by
+        translating it into a radix-64 representation. The term Base64
+        originates from a specific MIME content transfer encoding. Each Base64
+        digit represents exactly 6 bits of data. Three 8-bit bytes (i.e., a
+        total of 24 bits) can therefore be represented by four 6-bit Base64
+        digits.
+      </Typography>
+    ),
+    schema: {}
+  }
+];
+
 export const TOOLS = {
   Hashing: [
     ...HASH_FUNCTIONS.map(
@@ -70,9 +115,9 @@ export const TOOLS = {
           func: input => e.func(input.Message).toString(crypto.enc.Hex),
           name: e.name,
           live: true,
-          defaultValues: { Message: "hash me!" },
-          description: e.description
-        } as Tool<{ Message: string }, string, typeof e.name>)
+          description: e.description,
+          schema: {}
+        } as Tool<string, typeof e.name>)
     )
   ],
   Hmac: [
@@ -83,7 +128,6 @@ export const TOOLS = {
             e.func(input.Message, input.Passphrase).toString(crypto.enc.Hex),
           name: e.name,
           live: true,
-          defaultValues: { Message: "hash me!", Passphrase: "secret password" },
           description: (
             <Typography>
               In cryptography, an HMAC (sometimes expanded as either keyed-hash
@@ -99,12 +143,23 @@ export const TOOLS = {
               the cryptographic strength of the underlying hash function, the
               size of its hash output, and the size and quality of the key.
             </Typography>
-          )
-        } as Tool<
-          { Message: string; Passphrase: string },
-          string,
-          typeof e.name
-        >)
+          ),
+          schema: {
+            Passphrase: { type: "string", defaultValue: "hunter2" }
+          }
+        } as Tool<string, typeof e.name>)
+    )
+  ],
+  Encoding: [
+    ...ENCODING_FUNCTIONS.map(
+      e =>
+        ({
+          func: input => e.func(input.Message),
+          name: e.name,
+          live: true,
+          description: e.description,
+          schema: {}
+        } as Tool<string, typeof e.name>)
     )
   ]
 };
