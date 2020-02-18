@@ -1,4 +1,7 @@
+import React from "react";
+
 import crypto from "crypto-js";
+import { Typography } from "@material-ui/core";
 
 /**
  * List of all tools, generate UI from this.
@@ -15,11 +18,13 @@ type ToolFunc<I, O> = (input: I) => O;
  * defaultValues: the defualt inputs -- used to generate form
  * name: name of the function
  * live: should it update on each keypress? don't enable for taxing operations
+ * desc: description to show
  */
 type Tool<I, O, N> = {
   func: ToolFunc<I, O>;
   defaultValues: I;
   name: N;
+  description?: JSX.Element;
   live: boolean;
 };
 
@@ -27,7 +32,22 @@ type Tool<I, O, N> = {
  * FUNCTIONS
  */
 const HASH_FUNCTIONS = [
-  { func: crypto.MD5, name: "MD5" as const },
+  {
+    func: crypto.MD5,
+    name: "MD5" as const,
+    description: (
+      <Typography>
+        The MD5 message-digest algorithm is a widely used hash function
+        producing a 128-bit hash value. Although MD5 was initially designed to
+        be used as a cryptographic hash function, it has been found to suffer
+        from extensive vulnerabilities. It can still be used as a checksum to
+        verify data integrity, but only against unintentional corruption. It
+        remains suitable for other non-cryptographic purposes, for example for
+        determining the partition for a particular key in a partitioned
+        database.
+      </Typography>
+    )
+  },
   { func: crypto.SHA1, name: "SHA1" as const },
   { func: crypto.SHA256, name: "SHA256" as const },
   { func: crypto.SHA512, name: "SHA512" as const },
@@ -50,7 +70,8 @@ export const TOOLS = {
           func: input => e.func(input.Message).toString(crypto.enc.Hex),
           name: e.name,
           live: true,
-          defaultValues: { Message: "hash me!" }
+          defaultValues: { Message: "hash me!" },
+          description: e.description
         } as Tool<{ Message: string }, string, typeof e.name>)
     )
   ],
@@ -62,7 +83,23 @@ export const TOOLS = {
             e.func(input.Message, input.Passphrase).toString(crypto.enc.Hex),
           name: e.name,
           live: true,
-          defaultValues: { Message: "hash me!", Passphrase: "secret password" }
+          defaultValues: { Message: "hash me!", Passphrase: "secret password" },
+          description: (
+            <Typography>
+              In cryptography, an HMAC (sometimes expanded as either keyed-hash
+              message authentication code or hash-based message authentication
+              code) is a specific type of message authentication code (MAC)
+              involving a cryptographic hash function and a secret cryptographic
+              key. As with any MAC, it may be used to simultaneously verify both
+              the data integrity and the authenticity of a message. Any
+              cryptographic hash function, such as SHA-256 or SHA-3, may be used
+              in the calculation of an HMAC; the resulting MAC algorithm is
+              termed HMAC-X, where X is the hash function used (e.g. HMAC-SHA256
+              or HMAC-SHA3). The cryptographic strength of the HMAC depends upon
+              the cryptographic strength of the underlying hash function, the
+              size of its hash output, and the size and quality of the key.
+            </Typography>
+          )
         } as Tool<
           { Message: string; Passphrase: string },
           string,

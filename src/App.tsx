@@ -7,10 +7,11 @@ import styled from "styled-components";
 import { TOOLS, Category, CategoryTool } from "./tools";
 import MenuCategory from "./MenuCategory";
 import { ToolCtx, ToolCtxInit } from "./ToolCtx";
+import Tool from "./Tool";
 
 const MainContainer = styled(Container)`
   display: grid;
-  gap: 0.5em;
+  gap: 2.5em;
   grid-template-columns: 2fr 6fr 4fr;
   grid-template-rows: 7fr 3fr;
   max-width: 100%;
@@ -49,6 +50,7 @@ const App: React.FC = props => {
             )
           )}
         </ToolList>
+        <Tool tool={tool} />
       </MainContainer>
     </ToolCtx.Provider>
   );
