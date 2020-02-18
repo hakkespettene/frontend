@@ -16,10 +16,10 @@ type ToolFunc<I, O> = (input: I) => O;
  * name: name of the function
  * live: should it update on each keypress? don't enable for taxing operations
  */
-type Tool<I, O> = {
+type Tool<I, O, N> = {
   func: ToolFunc<I, O>;
   defaultValues: I;
-  name: string;
+  name: N;
   live: boolean;
 };
 
@@ -27,51 +27,50 @@ type Tool<I, O> = {
  * FUNCTIONS
  */
 const HASH_FUNCTIONS = [
-  { func: crypto.MD5, name: "MD5" },
-  { func: crypto.SHA1, name: "SHA1" },
-  { func: crypto.SHA256, name: "SHA256" },
-  { func: crypto.SHA512, name: "SHA512" },
-  { func: crypto.SHA3, name: "SHA3" },
-  { func: crypto.RIPEMD160, name: "RIPEMD160" }
+  { func: crypto.MD5, name: "MD5" as const },
+  { func: crypto.SHA1, name: "SHA1" as const },
+  { func: crypto.SHA256, name: "SHA256" as const },
+  { func: crypto.SHA512, name: "SHA512" as const },
+  { func: crypto.SHA3, name: "SHA3" as const },
+  { func: crypto.RIPEMD160, name: "RIPEMD160" as const }
 ];
 
 const HMAC_FUNCTIONS = [
-  { func: crypto.HmacMD5, name: "Hmac MD5" },
-  { func: crypto.HmacSHA1, name: "Hmac SHA1" },
-  { func: crypto.HmacSHA256, name: "Hmac SHA256" },
-  { func: crypto.HmacSHA512, name: "Hmac SHA512" }
+  { func: crypto.HmacMD5, name: "Hmac MD5" as const },
+  { func: crypto.HmacSHA1, name: "Hmac SHA1" as const },
+  { func: crypto.HmacSHA256, name: "Hmac SHA256" as const },
+  { func: crypto.HmacSHA512, name: "Hmac SHA512" as const }
 ];
 
-export const TOOLS: Array<Tool<any, any>> = [
-  {
-    func: () => null,
-    name: "====== HASHING ======",
-    defaultValues: {},
-    live: false
-  },
-  ...HASH_FUNCTIONS.map(
-    e =>
-      ({
-        func: input => e.func(input.Message).toString(crypto.enc.Hex),
-        name: e.name,
-        live: true,
-        defaultValues: { Message: "hash me!" }
-      } as Tool<{ Message: string }, string>)
-  ),
-  {
-    func: () => null,
-    name: "====== HMAC ======",
-    defaultValues: {},
-    live: false
-  },
-  ...HMAC_FUNCTIONS.map(
-    e =>
-      ({
-        func: input =>
-          e.func(input.Message, input.Passphrase).toString(crypto.enc.Hex),
-        name: e.name,
-        live: true,
-        defaultValues: { Message: "hash me!", Passphrase: "secret password" }
-      } as Tool<{ Message: string; Passphrase: string }, string>)
-  )
-];
+export const TOOLS = {
+  Hashing: [
+    ...HASH_FUNCTIONS.map(
+      e =>
+        ({
+          func: input => e.func(input.Message).toString(crypto.enc.Hex),
+          name: e.name,
+          live: true,
+          defaultValues: { Message: "hash me!" }
+        } as Tool<{ Message: string }, string, typeof e.name>)
+    )
+  ],
+  Hmac: [
+    ...HMAC_FUNCTIONS.map(
+      e =>
+        ({
+          func: input =>
+            e.func(input.Message, input.Passphrase).toString(crypto.enc.Hex),
+          name: e.name,
+          live: true,
+          defaultValues: { Message: "hash me!", Passphrase: "secret password" }
+        } as Tool<
+          { Message: string; Passphrase: string },
+          string,
+          typeof e.name
+        >)
+    )
+  ]
+};
+
+export type Category = keyof typeof TOOLS;
+export type CategoryTool = typeof TOOLS[Category][number];
