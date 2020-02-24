@@ -20,7 +20,8 @@ const MainContainer = styled(Container)`
 
 const ToolList = styled(List)`
   grid-row: 1 / span 2;
-  height: 100%;
+  max-height: 100%;
+  overflow-y: scroll;
   border-right: 1px solid rgba(0, 0, 0, 0.23);
   padding-right: 2.5em;
   padding-top: calc(3em - 8px);
@@ -57,19 +58,32 @@ const OutputField = styled(InputField)`
 `;
 
 const App: React.FC = props => {
+  /**
+   * Keep track of which tool we're currently using
+   */
   const [tool, setTool] = React.useState<{
     category: Category;
     name: CategoryTool["name"];
   }>(ToolCtxInit);
 
+  /**
+   * Extract the tool (object) we're using based on the name of the tool.
+   */
   const selected = (TOOLS[tool.category] as Array<CategoryTool>).find(
     e => e.name === tool.name
   )!;
 
+  /**
+   * The input to the function (Message field).
+   */
   const [input, setInput] = React.useState<
     Partial<Parameters<CategoryTool["func"]>[number]>
   >({ Message: "" });
 
+  /**
+   * When the selected tool changes, we want to update the value objec to
+   * contain the default values for that tool.
+   */
   React.useEffect(() => {
     const defaults = Object.fromEntries(
       Object.entries(selected.schema).map(([k, v]) => [k, v.defaultValue])
@@ -78,6 +92,11 @@ const App: React.FC = props => {
     setInput({ Message: "", ...defaults });
   }, [selected]);
 
+  /**
+   * When the input (Message field) changes, set the state accordingly and if
+   * it is a live tool (i.e. the operation is not costly, so we can update
+   * every edit) update the output.
+   */
   const inputChangeHandler: React.ChangeEventHandler<HTMLInputElement> = ev => {
     const resp = ev.currentTarget.value;
     setInput(e => ({ ...e, Message: resp }));
@@ -89,6 +108,11 @@ const App: React.FC = props => {
 
   const [output, setOutput] = React.useState<typeof props.children>("");
 
+  /**
+   * Calculate the output of the tool function.
+   *
+   * @param i The input to run the function with.
+   */
   const calcOutput = (i: typeof input = input) => {
     setOutput((selected.func as Function)(i));
   };

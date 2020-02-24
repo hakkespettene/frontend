@@ -73,7 +73,7 @@ const Tool: React.FC<Props> = props => {
                     key={fieldName}
                     label={fieldName}
                     onChange={updateField(fieldName)}
-                    value={props.input[fieldName] || fieldOptions.defaultValue}
+                    value={props.input[fieldName] || ""}
                   />
                 );
               case "number":
@@ -81,7 +81,7 @@ const Tool: React.FC<Props> = props => {
                   <TextField
                     label={fieldName}
                     onChange={updateField(fieldName)}
-                    value={props.input[fieldName] || fieldOptions.defaultValue}
+                    value={props.input[fieldName] || ""}
                     type="number"
                   />
                 );

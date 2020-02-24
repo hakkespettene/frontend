@@ -20,7 +20,7 @@ type Props = {
 };
 
 const MenuCategory: React.FC<Props> = props => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const toggleOpen = () => setOpen(e => !e);
 
