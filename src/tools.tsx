@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   ENCODING_TOOLS,
   HASH_TOOLS,
