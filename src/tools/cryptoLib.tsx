@@ -125,3 +125,88 @@ export const ENCODING_TOOLS = [
       } as Tool<string, typeof e.name>)
   )
 ];
+
+const ENCRYPTION_FUNCTIONS = [
+  {
+    func: crypto.AES.encrypt,
+    name: "AES Encrypt" as const,
+    description: (
+      <Typography>
+        The Advanced Encryption Standard (AES) is a U.S. Federal Information
+        Processing Standard (FIPS). It was selected after a 5-year process where
+        15 competing designs were evaluated. CryptoJS supports AES-128, AES-192,
+        and AES-256. It will pick the variant by the size of the key you pass
+        in. If you use a passphrase, then it will generate a 256-bit key.
+      </Typography>
+    )
+  },
+  {
+    func: crypto.AES.decrypt,
+    name: "AES Decrypt" as const,
+    description: (
+      <Typography>
+        The Advanced Encryption Standard (AES) is a U.S. Federal Information
+        Processing Standard (FIPS). It was selected after a 5-year process where
+        15 competing designs were evaluated. CryptoJS supports AES-128, AES-192,
+        and AES-256. It will pick the variant by the size of the key you pass
+        in. If you use a passphrase, then it will generate a 256-bit key.
+      </Typography>
+    )
+  },
+  {
+    func: crypto.DES.encrypt,
+    name: "DES Encrypt" as const,
+    description: (
+      <Typography>
+        DES is a previously dominant algorithm for encryption, and was published
+        as an official Federal Information Processing Standard (FIPS). DES is
+        now considered to be insecure due to the small key size.
+      </Typography>
+    )
+  },
+  {
+    func: crypto.DES.decrypt,
+    name: "DES Decrypt" as const,
+    description: (
+      <Typography>
+        DES is a previously dominant algorithm for encryption, and was published
+        as an official Federal Information Processing Standard (FIPS). DES is
+        now considered to be insecure due to the small key size.
+      </Typography>
+    )
+  },
+  {
+    func: crypto.TripleDES.encrypt,
+    name: "Triple DES Encrypt" as const,
+    description: (
+      <Typography>
+        Triple DES applies DES three times to each block to increase the key
+        size. The algorithm is believed to be secure in this form.
+      </Typography>
+    )
+  },
+  {
+    func: crypto.TripleDES.decrypt,
+    name: "Triple DES Decrypt" as const,
+    description: (
+      <Typography>
+        Triple DES applies DES three times to each block to increase the key
+        size. The algorithm is believed to be secure in this form.
+      </Typography>
+    )
+  }
+];
+export const ENCRYPTION_TOOLS = [
+  ...ENCRYPTION_FUNCTIONS.map(
+    e =>
+      ({
+        func: input => e.func(input.Message, input["Passphrase"]).toString(),
+        live: true,
+        name: e.name,
+        description: e.description,
+        schema: {
+          Passphrase: { type: "string", defaultValue: "hunter2" }
+        }
+      } as Tool<string, typeof e.name>)
+  )
+];

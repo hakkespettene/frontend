@@ -1,7 +1,13 @@
 import React from "react";
 
-import { ENCODING_TOOLS, HASH_TOOLS, HMAC_TOOLS } from "./tools/cryptoLib";
+import {
+  ENCODING_TOOLS,
+  HASH_TOOLS,
+  HMAC_TOOLS,
+  ENCRYPTION_TOOLS
+} from "./tools/cryptoLib";
 import { fromHex } from "./tools/fromHex";
+import { caesarCipher } from "./tools/caesarCipher";
 
 /**
  * List of all tools, generate UI from this.
@@ -45,7 +51,8 @@ export type Tool<O, N> = {
 export const TOOLS = {
   Hashing: HASH_TOOLS,
   Hmac: HMAC_TOOLS,
-  Encoding: [...ENCODING_TOOLS, fromHex]
+  Encoding: [...ENCODING_TOOLS, fromHex],
+  Encryption: [caesarCipher, ...ENCRYPTION_TOOLS]
 };
 
 export type Category = keyof typeof TOOLS;
